@@ -1,0 +1,45 @@
+{
+  "name": "expressjs2",
+  "version": "1.0.0",
+  "description": "",
+  "main": "src/index.js",
+  "scripts": {
+    "serve": "nodemon src/index.js",
+    "test": "jest -i",
+    "jest-w": "jest --watchAll"
+  },
+  "jest": {
+    "transform": {
+      "^.+\\.[t|j]sx?$": "babel-jest"
+    }
+  },
+  "author": "zain",
+  "license": "ISC",
+  "type": "module",
+  "dependencies": {
+    "@prisma/client": "^5.8.1",
+    "axios": "^1.6.7",
+    "bcrypt": "^5.1.1",
+    "body-parser": "^1.20.2",
+    "cors": "^2.8.5",
+    "express": "^4.18.2",
+    "joi": "^17.11.1",
+    "nodemailer": "^6.9.9",
+    "nodemon": "^3.0.3",
+    "otp-generator": "^4.0.1",
+    "uuid": "^9.0.1",
+    "winston": "^3.11.0"
+  },
+  "devDependencies": {
+    "@babel/preset-env": "^7.23.8",
+    "@types/bcrypt": "^5.0.2",
+    "@types/express": "^4.17.21",
+    "@types/jest": "^29.5.11",
+    "@types/supertest": "^6.0.2",
+    "@types/uuid": "^9.0.7",
+    "babel-jest": "^29.7.0",
+    "jest": "^29.7.0",
+    "prisma": "^5.8.1",
+    "supertest": "^6.3.4"
+  }
+}

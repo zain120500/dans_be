@@ -1,0 +1,261 @@
+import supertest from "supertest"
+import { logger } from "../src/aplication/logging.js"
+import { web } from "../src/aplication/web.js"
+import { removeTestUser,createTestUser, deleteAllContact, getContactTest, createContactTest, createManyContactTest, deleteAllAddress, getAddressTest, createAddressTest } from "./test-util.js"
+
+
+describe('POST /api/contacts/:contactId/addresses', function(){
+    beforeEach(async () => {
+        await createTestUser();
+        await createContactTest();
+    })
+
+    afterEach(async () => {
+        await deleteAllAddress();
+        await deleteAllContact();
+        await removeTestUser();
+    })
+
+    it('should can create', async () => {
+        const contactId = await getContactTest()
+        const result = await supertest(web)
+        .post('/api/contacts/' + contactId.id + '/addresses')
+        .set('Authorization', 'test')
+        .send({
+            street: "jalan test",
+            city: "kota test",
+            province: "provinsi test",
+            country: "negara test",
+            postal_code: "111111",
+        })
+       
+        expect(result.status).toBe(200);
+        expect(result.body.data.street).toBe("jalan test");
+        expect(result.body.data.city).toBe("kota test");
+        expect(result.body.data.province).toBe("provinsi test");
+        expect(result.body.data.country).toBe("negara test");
+        expect(result.body.data.postal_code).toBe("111111");
+       
+    })
+
+    it('should cant create invalid', async () => {
+        const contactId = await getContactTest()
+        const result = await supertest(web)
+        .post('/api/contacts/' + contactId.id + '/addresses')
+        .set('Authorization', 'test')
+        .send({
+            street: "jalan test",
+            city: "kota test",
+            province: "provinsi test",
+            country: "",
+            postal_code: "",
+        })
+       
+        console.log(result.body.errors);
+        expect(result.status).toBe(400);
+    })
+
+    it('should cant create invalid not found', async () => {
+        const contactId = await getContactTest()
+        const result = await supertest(web)
+        .post('/api/contacts/' + contactId.id + 1 + '/addresses')
+        .set('Authorization', 'test')
+        .send({
+            street: "jalan test",
+            city: "kota test",
+            province: "provinsi test",
+            country: "",
+            postal_code: "",
+        })
+       
+        console.log(result.body.errors);
+        expect(result.status).toBe(404);       
+    })
+
+})
+
+describe('GET /api/contacts/:contactId/addresses/:addressId', function(){
+    beforeEach(async () => {
+        await createTestUser();
+        await createContactTest();
+        await createAddressTest();
+    })
+
+    afterEach(async () => {
+        await deleteAllAddress();
+        await deleteAllContact();
+        await removeTestUser();
+    })
+
+    it('should can get', async () => {
+        const contactId = await getContactTest()
+        const addressId = await getAddressTest()
+
+        const result = await supertest(web)
+        .get('/api/contacts/' + contactId.id + '/addresses/'+ addressId.id )
+        .set('Authorization', 'test')
+       
+        console.log(result.body.errors);
+        expect(result.status).toBe(200);
+       
+    })
+
+})
+
+describe('PUT /api/contacts/:contactId/addresses/:addressId', function(){
+    beforeEach(async () => {
+        await createTestUser();
+        await createContactTest();
+        await createAddressTest();
+    })
+
+    afterEach(async () => {
+        await deleteAllAddress();
+        await deleteAllContact();
+        await removeTestUser();
+    })
+
+    it('should can update', async () => {
+        const contactId = await getContactTest()
+        const addressId = await getAddressTest()
+        const result = await supertest(web)
+        .put('/api/contacts/' + contactId.id + '/addresses/'+ addressId.id )
+        .set('Authorization', 'test')
+        .send({
+            street: "street",
+            city: "city",
+            province: "provinsi",
+            country: "negara",
+            postal_code: "22222",
+        })
+    
+        expect(result.status).toBe(200);
+        expect(result.body.data.street).toBe("street");
+        expect(result.body.data.city).toBe("city");
+        expect(result.body.data.province).toBe("provinsi");
+        expect(result.body.data.country).toBe("negara");
+        expect(result.body.data.postal_code).toBe("22222");
+    })
+
+    it('should cant update invalid', async () => {
+        const contactId = await getContactTest()
+        const addressId = await getAddressTest()
+        const result = await supertest(web)
+        .put('/api/contacts/' + contactId.id + '/addresses/'+ addressId.id )
+        .set('Authorization', 'test')
+        .send({
+            street: "street",
+            city: "city",
+            province: "provinsi",
+            country: "",
+            postal_code: "",
+        })
+    
+        expect(result.status).toBe(400);
+    })
+
+    it('should cant update notfaund', async () => {
+        const contactId = await getContactTest()
+        const addressId = await getAddressTest()
+        const result = await supertest(web)
+        .put('/api/contacts/' + contactId.id + '/addresses/'+ addressId.id + 1 )
+        .set('Authorization', 'test')
+        .send({
+            street: "street",
+            city: "city",
+            province: "provinsi",
+            country: "negara",
+            postal_code: "22222",
+        })
+    
+        expect(result.status).toBe(404);
+    })
+
+})
+
+describe('DELETE /api/contacts/:contactId/addresses/:addressId', function(){
+    beforeEach(async () => {
+        await createTestUser();
+        await createContactTest();
+        await createAddressTest();
+    })
+
+    afterEach(async () => {
+        await deleteAllAddress();
+        await deleteAllContact();
+        await removeTestUser();
+    })
+
+    it('should can delete', async () => {
+        const contactId = await getContactTest()
+        let addressId = await getAddressTest()
+        const result = await supertest(web)
+        .delete('/api/contacts/' + contactId.id + '/addresses/'+ addressId.id )
+        .set('Authorization', 'test')
+      
+        expect(result.status).toBe(200);
+        expect(result.body.data).toBe("ok");
+
+        addressId = await getAddressTest()
+        expect(addressId).toBeNull();
+    })
+
+    it('should cant delete notfound', async () => {
+        const contactId = await getContactTest()
+        let addressId = await getAddressTest()
+        const result = await supertest(web)
+        .delete('/api/contacts/' + contactId.id + '/addresses/'+ addressId.id + 1)
+        .set('Authorization', 'test')
+      
+        expect(result.status).toBe(404);
+    })
+
+    it('should cant delete contact notfound', async () => {
+        const contactId = await getContactTest()
+        let addressId = await getAddressTest()
+        const result = await supertest(web)
+        .delete('/api/contacts/' + (contactId.id + 1 )+ '/addresses/'+ addressId.id + 1)
+        .set('Authorization', 'test')
+      
+        expect(result.status).toBe(404);
+    })
+
+})
+
+describe('GET /api/contacts/:contactId/addresses/', function(){
+    beforeEach(async () => {
+        await createTestUser();
+        await createContactTest();
+        await createAddressTest();
+    })
+
+    afterEach(async () => {
+        await deleteAllAddress();
+        await deleteAllContact();
+        await removeTestUser();
+    })
+
+    it('should can get', async () => {
+        const contactId = await getContactTest()
+    
+        const result = await supertest(web)
+        .get('/api/contacts/' + contactId.id + '/addresses/')
+        .set('Authorization', 'test')
+       
+        console.log(result.body.errors);
+        expect(result.status).toBe(200);
+        expect(result.body.data.length).toBe(1);
+    })
+
+    it('should cant get not found', async () => {
+        const contactId = await getContactTest()
+    
+        const result = await supertest(web)
+        .get('/api/contacts/' + (contactId.id + 1) + '/addresses/')
+        .set('Authorization', 'test')
+       
+        console.log(result.body.errors);
+        expect(result.status).toBe(404);
+    })
+
+})

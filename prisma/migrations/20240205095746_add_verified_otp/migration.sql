@@ -1,0 +1,2 @@
+-- AlterTable
+ALTER TABLE `otp` ADD COLUMN `verified` TINYINT NOT NULL DEFAULT 0;
